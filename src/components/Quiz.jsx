@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
+import ProgressBar from "./ProgressBar";
 import QUESTIONS from "../questions.js";
 import trophyIcon from "../assets/quiz-complete.png";
 
@@ -9,11 +10,13 @@ export default function Quiz() {
   const activeQuestionIndex = userAnswers.length;
   const quizIsOver = activeQuestionIndex === QUESTIONS.length;
 
-  const handleSelect = (selectedAnswer) => {
+  const handleSelect = useCallback((selectedAnswer) => {
     setUserAnswers((prevAnswers) => {
       return [...prevAnswers, selectedAnswer];
     });
-  };
+  }, []);
+
+  const handleSkip = useCallback(() => handleSelect(null), [handleSelect]);
 
   if (quizIsOver) {
     return (
@@ -30,6 +33,11 @@ export default function Quiz() {
   return (
     <div id="quiz">
       <div id="question">
+        <ProgressBar
+          key={activeQuestionIndex}
+          timeout={5000}
+          onTimeout={handleSkip}
+        />
         <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
         <ul id="answers">
           {shuffledAnswers.map((answer) => (
